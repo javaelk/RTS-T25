@@ -1,11 +1,14 @@
 package uw.star.rts.analysis;
 import uw.star.rts.analysis.jaxb.Dependencies;
 import uw.star.rts.artifact.*;
+import uw.star.rts.util.XMLJAXBUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.exec.*;
 import org.slf4j.LoggerFactory;
@@ -80,23 +83,31 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public List<String> findDirectDependentClasses(ClassEntity c){
 		List<String> resultLst = new ArrayList<String>();
 
-		if(dp==null)
-			dp = unmarshall(xmlfile);
-		if(dp!=null){	
-			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
-				//this is optimized to compare package name first then class name
-				if(p.getName().equals(c.getPackageName())){
-					for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
-						if(c.getClassName().equals(cls.getName())){
-							for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
-								resultLst.add(ib.getContent());
-							break;
+		try{
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+
+			if(dp!=null){	
+				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
+					//this is optimized to compare package name first then class name
+					if(p.getName().equals(c.getPackageName())){
+						for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
+							if(c.getClassName().equals(cls.getName())){
+								for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
+									resultLst.add(ib.getContent());
+								break;
+							}
 						}
 					}
 				}
+			}else{
+				log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
 			}
-		}else{
-			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+		}catch(IOException e){
+			log.error("IOException in reading file " + xmlfile.getFileName());
+			e.printStackTrace();
+		}catch(JAXBException e){
+			log.error("JAXBException"+ xmlfile.getFileName());
+			e.printStackTrace();
 		}
 		return resultLst;
 	}
@@ -110,21 +121,28 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public List<String> findDirectDependentClasses(String c){
 		List<String> resultLst = new ArrayList<String>();
 		//use JAXB to unmarshall XML doc if not already done. this would read the whole xml file into memory as a tree
-		if(dp==null)
-			dp = unmarshall(xmlfile);
-		if(dp!=null){
-			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
-				for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
-					if(c.equals(cls.getName())){
-						for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
-							resultLst.add(ib.getContent());
-						break;
+		try{
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+			if(dp!=null){
+				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
+					for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
+						if(c.equals(cls.getName())){
+							for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
+								resultLst.add(ib.getContent());
+							break;
+						}
 					}
 				}
-			}
-		}else{
-			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
-		}	
+			}else{
+				log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+			}	
+		}catch(IOException e){
+			log.error("IOException in reading file " + xmlfile.getFileName());
+			e.printStackTrace();
+		}catch(JAXBException e){
+			log.error("JAXBException"+ xmlfile.getFileName());
+			e.printStackTrace();
+		}
 		return resultLst;
 	}
 
@@ -136,40 +154,47 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public Map<ClassEntity,List<String>> findDirectDependentClasses(List<ClassEntity> classEntities){
 		Map<ClassEntity,List<String>> resultmap = new HashMap<ClassEntity,List<String>>();
 		List<String> resultLst = new ArrayList<String>();
-		if(dp==null)
-			dp = unmarshall(xmlfile);
-		if(dp!=null){
-			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
-				log.debug("parsing package "+ p.getName());
-				for(ClassEntity ce: classEntities){
-					log.debug("Search dependent for class: package = " + ce.getPackageName() + " className=" +  ce.getClassName() );
-					if(resultmap.containsKey(ce)) {
-						log.debug("\tskip -- already found dependent classes for " + ce.getName() );
-						break; //skip it if ce's inbound dependencies are already found
-					}
-					if(p.getName().equals(ce.getPackageName())){
-						log.debug("\tsame package, search continues ...");
-						for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
-							if(ce.getName().equals(cls.getName())){//same package , same class
-								log.debug("\t\t same package, same class, found! ");
-								for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
-									resultLst.add(ib.getContent());
-								resultmap.put(ce, resultLst);
-								resultLst=new ArrayList<>();  
-								break;//same ce won't be the same package again, skip through
-							}else{
-								log.debug("\t\tclass name in xml "+ cls.getName() + " is different from " + ce.getName() );
-							}
+		try{
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+			if(dp!=null){
+				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
+					log.debug("parsing package "+ p.getName());
+					for(ClassEntity ce: classEntities){
+						log.debug("Search dependent for class: package = " + ce.getPackageName() + " className=" +  ce.getClassName() );
+						if(resultmap.containsKey(ce)) {
+							log.debug("\tskip -- already found dependent classes for " + ce.getName() );
+							break; //skip it if ce's inbound dependencies are already found
 						}
-					}else{
-						log.debug("\tdifferent package, search next");
+						if(p.getName().equals(ce.getPackageName())){
+							log.debug("\tsame package, search continues ...");
+							for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
+								if(ce.getName().equals(cls.getName())){//same package , same class
+									log.debug("\t\t same package, same class, found! ");
+									for(uw.star.rts.analysis.jaxb.Inbound ib : cls.getInbound())
+										resultLst.add(ib.getContent());
+									resultmap.put(ce, resultLst);
+									resultLst=new ArrayList<>();  
+									break;//same ce won't be the same package again, skip through
+								}else{
+									log.debug("\t\tclass name in xml "+ cls.getName() + " is different from " + ce.getName() );
+								}
+							}
+						}else{
+							log.debug("\tdifferent package, search next");
+						}
 					}
 				}
+			}else{
+				log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
 			}
-		}else{
-			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+		}catch(IOException e){
+			log.error("IOException in reading file " + xmlfile.getFileName());
+			e.printStackTrace();
+		}catch(JAXBException e){
+			log.error("JAXBException"+ xmlfile.getFileName());
+			e.printStackTrace();
 		}
 		return resultmap;
 	}
-	
+
 }

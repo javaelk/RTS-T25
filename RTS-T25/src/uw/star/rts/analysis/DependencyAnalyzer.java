@@ -5,10 +5,12 @@ import uw.star.rts.util.FileUtility;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.util.*;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
@@ -202,29 +204,7 @@ public class DependencyAnalyzer {
 		}
 		return env;
 	}
-	
-	/**
-	 * Helper method to unmarshall a DependencyFinder result xml doc
-	 * @see http://docs.oracle.com/javase/tutorial/jaxb/intro/basic.html
-	 */
-	Dependencies unmarshall(Path aXMLFile){
-		Dependencies dp=null;
-		try{
-			JAXBContext jaxbContext = JAXBContext.newInstance("uw.star.rts.analysis.jaxb");
-			Unmarshaller u = jaxbContext.createUnmarshaller();
-			dp = (Dependencies)u.unmarshal(Files.newInputStream(aXMLFile));
 
-		} catch( UnmarshalException ue ) {
-			log.error("Caught UnmarshalException " + aXMLFile.getFileName());
-		} catch( JAXBException je ) {
-			log.error("JAXBException"+ aXMLFile.getFileName());
-			je.printStackTrace();
-		}catch(IOException e){
-			log.error("IOException in reading file " + aXMLFile.getFileName());
-			e.printStackTrace();
-		}
-		return dp;
-	}
 
 	
 	 class DependencyFinderResultHandler extends DefaultExecuteResultHandler {

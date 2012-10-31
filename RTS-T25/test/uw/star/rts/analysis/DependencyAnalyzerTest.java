@@ -59,12 +59,5 @@ public class DependencyAnalyzerTest {
 			e.printStackTrace();
 		}
 	}
-   @Test
-   public void testUnmarshall(){
-	   Path emptyfile = Paths.get("test"+File.separator+"testfiles"+File.separator+"empty_resultFile.xml");
-	   Path fileNotExist = Paths.get("test"+File.separator+"testfiles"+File.separator+"donotexist.xml");
-	   DependencyAnalyzer da = new DependencyAnalyzer();
-	   assertTrue(da.unmarshall(emptyfile)!=null);
-	   assertTrue(da.unmarshall(fileNotExist)==null);
-   }
+
 }

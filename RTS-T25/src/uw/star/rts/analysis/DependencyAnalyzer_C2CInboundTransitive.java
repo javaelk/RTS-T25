@@ -2,6 +2,7 @@ package uw.star.rts.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,11 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.exec.CommandLine;
 import org.slf4j.LoggerFactory;
 
 import uw.star.rts.analysis.jaxb.Dependencies;
 import uw.star.rts.artifact.ClassEntity;
+import uw.star.rts.util.XMLJAXBUtil;
 
 /**
  * Run dependency finder tool to analyze Class to class inbound dependency including transitively dependent classes and generate a XML file
@@ -53,20 +57,28 @@ public class DependencyAnalyzer_C2CInboundTransitive extends DependencyAnalyzer 
 		}catch(InterruptedException e){
 			e.printStackTrace();
 		}
-		//unmarshal the result xml file
-		Dependencies dp = unmarshall(finalOutput);
+
 
 		//return all class names in the result xml file , as this result xml file is for the given ClassEntity only
 		List<String> resultLst = new ArrayList<String>();
-		if(dp!=null){
-			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage())
-				for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz())
-					resultLst.add(cls.getName());
-		}else{
-			log.error("context tree is still null after unmarshall the result xml file " + finalOutput.getFileName());
+		try{
+			//unmarshal the result xml file
+			Dependencies dp = XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(finalOutput));
+			if(dp!=null){
+				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage())
+					for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz())
+						resultLst.add(cls.getName());
+			}else{
+				log.error("context tree is still null after unmarshall the result xml file " + finalOutput.getFileName());
+			}
+		}catch(IOException e){
+			log.error("IOException in reading file " + finalOutput.getFileName());
+			e.printStackTrace();
+		}catch(JAXBException e){
+			log.error("JAXBException"+ finalOutput.getFileName());
+			e.printStackTrace();
 		}
 		return resultLst;
-		
 	}
 
 	
