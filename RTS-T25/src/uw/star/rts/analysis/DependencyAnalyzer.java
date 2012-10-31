@@ -77,14 +77,14 @@ public class DependencyAnalyzer {
     }
 	
    /**
-    * wait until xmlfile is created and readable
+    * wait until xmlfile is created and writeable
     * @param xmlfile
     * @return
     */
    boolean waitForFileCreated(Path xmlfile){
 
 	   //scenario 1 - already created
-	   if(Files.exists(xmlfile)&&Files.isReadable(xmlfile))
+	   if(Files.exists(xmlfile)&&Files.isWritable(xmlfile))
 		   return true;
 
 	   //scenario2 - does not exist or not readable
@@ -96,7 +96,7 @@ public class DependencyAnalyzer {
 		   } catch (InterruptedException e) {
 			   e.printStackTrace();
 		   }
-		   if(Files.exists(xmlfile)&&Files.isReadable(xmlfile))
+		  if(Files.exists(xmlfile)&&Files.isWritable(xmlfile))
 			   return true;
 		   counter++;
 	   }while(counter <= 6);

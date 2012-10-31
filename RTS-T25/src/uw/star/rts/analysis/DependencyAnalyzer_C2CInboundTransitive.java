@@ -58,10 +58,13 @@ public class DependencyAnalyzer_C2CInboundTransitive extends DependencyAnalyzer 
 
 		//return all class names in the result xml file , as this result xml file is for the given ClassEntity only
 		List<String> resultLst = new ArrayList<String>();
-		if(dp!=null)
+		if(dp!=null){
 			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage())
 				for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz())
 					resultLst.add(cls.getName());
+		}else{
+			log.error("context tree is still null after unmarshall the result xml file " + finalOutput.getFileName());
+		}
 		return resultLst;
 		
 	}

@@ -56,13 +56,13 @@ public class ClassFirewallExtendedTest{
 	selectedTC = classFirewalltech1.selectTests(v0, v1,new StopWatch());
 	System.out.println("=== test cases selected by ClassFirewall for v6 : " + selectedTC.size() + " ==="); 
 	System.out.println(selectedTC);
-	assertEquals("size of selected test cases",21,selectedTC.size());
+	assertEquals("size of selected test cases",28,selectedTC.size());
 	int count =0;
 	for(TestCase tc: selectedTC)
 		if( tc.isApplicabletoVersion(1))
 			count ++;
 	System.out.println("selected test cases applicable to version 1 :" + count);
-	assertEquals("Total number of test cases applicable to v1 ",105,testapp.getTestSuite().getTestCaseByVersion(1).size());
+	assertEquals("Total number of test cases applicable to v1 ",34,testapp.getTestSuite().getTestCaseByVersion(1).size());
 	}
 	@Test
 	public void testSelectTests2() {

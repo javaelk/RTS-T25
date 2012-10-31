@@ -80,15 +80,18 @@ public  class MD5ClassChangeAnalyzer {
 	 * @return true if files have the same MD5 digest, false otherwise. If any of the files can not be opened, return false
 	 */
 	public static boolean hasSameMD5Digest(Path f0, Path f1){
-		try{
-			//System.out.println("Calculate md5hex of " + f0);
-			String f0md5 = DigestUtils.md5Hex(Files.newInputStream(f0));
-			
-			String f1md5 = DigestUtils.md5Hex(Files.newInputStream(f1));
-			return f0md5.equals(f1md5);
-		}catch(IOException e){
-			log.error("Error opening file " + f0 + " or " + f1);
+		if(Files.exists(f0)&&Files.exists(f1)){
+			try{
+				String f0md5 = DigestUtils.md5Hex(Files.newInputStream(f0));
+				String f1md5 = DigestUtils.md5Hex(Files.newInputStream(f1));
+				return f0md5.equals(f1md5);
+			}catch(IOException e){
+				log.error("Error opening file " + f0 + " or " + f1);
+			}
+		}else{
+			log.error("Either " + f0.getFileName() + " or " + f1.getFileName() + " does not exist"); 
 		}
+
 		return false;
 	}
 }

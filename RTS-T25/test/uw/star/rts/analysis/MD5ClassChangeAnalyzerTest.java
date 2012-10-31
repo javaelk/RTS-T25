@@ -80,12 +80,12 @@ public class MD5ClassChangeAnalyzerTest {
 		
 		Program p5 = testapp.getProgram(ProgramVariant.orig, 5);
 		Program p6= testapp.getProgram(ProgramVariant.orig, 6);
-		CodeCoverageAnalyzer cca5 = new EmmaCodeCoverageAnalyzer(af,testapp,p0,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca5 = new EmmaCodeCoverageAnalyzer(af,testapp,p5,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca1.extractEntities(EntityType.SOURCE);
 		cca5.extractEntities(EntityType.CLAZZ);
 		
-		CodeCoverageAnalyzer cca6 = new EmmaCodeCoverageAnalyzer(af,testapp,p1,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca6 = new EmmaCodeCoverageAnalyzer(af,testapp,p6,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca2.extractEntities(EntityType.SOURCE);
 		cca6.extractEntities(EntityType.CLAZZ);

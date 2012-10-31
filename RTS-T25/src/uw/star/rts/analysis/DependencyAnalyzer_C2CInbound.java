@@ -82,7 +82,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 
 		if(dp==null)
 			dp = unmarshall(xmlfile);
-		if(dp!=null)	
+		if(dp!=null){	
 			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
 				//this is optimized to compare package name first then class name
 				if(p.getName().equals(c.getPackageName())){
@@ -95,6 +95,9 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 					}
 				}
 			}
+		}else{
+			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+		}
 		return resultLst;
 	}
 
@@ -109,7 +112,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 		//use JAXB to unmarshall XML doc if not already done. this would read the whole xml file into memory as a tree
 		if(dp==null)
 			dp = unmarshall(xmlfile);
-		if(dp!=null)
+		if(dp!=null){
 			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
 				for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
 					if(c.equals(cls.getName())){
@@ -119,6 +122,9 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 					}
 				}
 			}
+		}else{
+			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+		}	
 		return resultLst;
 	}
 
@@ -132,7 +138,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 		List<String> resultLst = new ArrayList<String>();
 		if(dp==null)
 			dp = unmarshall(xmlfile);
-		if(dp!=null)
+		if(dp!=null){
 			for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
 				log.debug("parsing package "+ p.getName());
 				for(ClassEntity ce: classEntities){
@@ -160,7 +166,9 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 					}
 				}
 			}
-
+		}else{
+			log.error("context tree is still null after unmarshall the result xml file " + xmlfile.getFileName());
+		}
 		return resultmap;
 	}
 	
