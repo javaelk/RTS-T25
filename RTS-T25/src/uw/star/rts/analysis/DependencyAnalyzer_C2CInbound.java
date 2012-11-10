@@ -1,5 +1,6 @@
 package uw.star.rts.analysis;
 import uw.star.rts.analysis.jaxb.Dependencies;
+import java.io.InputStream;
 import uw.star.rts.artifact.*;
 import uw.star.rts.util.XMLJAXBUtil;
 
@@ -83,8 +84,8 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public List<String> findDirectDependentClasses(ClassEntity c){
 		List<String> resultLst = new ArrayList<String>();
 
-		try{
-			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+		try(InputStream stream = Files.newInputStream(xmlfile)){
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,stream);
 
 			if(dp!=null){	
 				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
@@ -121,8 +122,8 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public List<String> findDirectDependentClasses(String c){
 		List<String> resultLst = new ArrayList<String>();
 		//use JAXB to unmarshall XML doc if not already done. this would read the whole xml file into memory as a tree
-		try{
-			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+		try(InputStream stream = Files.newInputStream(xmlfile)){
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,stream);
 			if(dp!=null){
 				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
 					for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz()){
@@ -154,8 +155,8 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 	public Map<ClassEntity,List<String>> findDirectDependentClasses(List<ClassEntity> classEntities){
 		Map<ClassEntity,List<String>> resultmap = new HashMap<ClassEntity,List<String>>();
 		List<String> resultLst = new ArrayList<String>();
-		try{
-			dp=XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(xmlfile));
+		try(InputStream stream = Files.newInputStream(xmlfile)){
+			dp=XMLJAXBUtil.unmarshall(Dependencies.class,stream);
 			if(dp!=null){
 				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage()){
 					log.debug("parsing package "+ p.getName());

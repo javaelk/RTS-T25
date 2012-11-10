@@ -1,6 +1,7 @@
 package uw.star.rts.technique;
 
 import static org.junit.Assert.*;
+import com.javamex.classmexer.MemoryUtil;
 
 import java.io.File;
 import java.util.List;
@@ -74,9 +75,14 @@ public class ClassFirewallExtendedTest{
 	Program v5=testapp.getProgram(ProgramVariant.orig, 5);
 	Program v6=testapp.getProgram(ProgramVariant.orig, 6);
 	uw.star.rts.technique.Technique classFirewalltech1 = new ClassFirewall_Extended();
+	//System.out.println("ClassFirewall_Extended deep memory usage: 1- after constructor call: "+ MemoryUtil.deepMemoryUsageOf(classFirewalltech1));
 	classFirewalltech1.setApplication(testapp);
+	
+	//System.out.println("ClassFirewall_Extended deep memory usage: 2- after set application: " + MemoryUtil.deepMemoryUsageOf(classFirewalltech1));
 	List<TestCase> selectedTC = classFirewalltech1.selectTests(v0, v1,new StopWatch());
+	//System.out.println("ClassFirewall_Extended deep memory usage: 3- after select test of v0v1: " + MemoryUtil.deepMemoryUsageOf(classFirewalltech1));
 	selectedTC = classFirewalltech1.selectTests(v5, v6,new StopWatch());
+	//System.out.println("ClassFirewall_Extended deep memory usage: 4- after select test of v5v6: " + MemoryUtil.deepMemoryUsageOf(classFirewalltech1));
 	System.out.println("=== test cases selected by ClassFirewall for v6 : " + selectedTC.size() + " ==="); 
 	System.out.println(selectedTC);
 	assertEquals("size of selected test cases",21,selectedTC.size());

@@ -175,15 +175,14 @@ public class DependencyAnalyzer {
 	 */
 	void getConfig(){
 		Properties config = new Properties();
-		try{
-			config.load(Files.newInputStream(Paths.get(CONFIGFILE)));
+		try(InputStream stream = Files.newInputStream(Paths.get(CONFIGFILE))){
+			config.load(stream);
 			dependencyFinderCommand = config.getProperty("DEPENDENCYFINDER_COMMAND");
 			outputFile = config.getProperty("OUTPUTFILE");
 			jobTimeout = Integer.parseInt(config.getProperty("JOBTIMEOUT"));
 			JAVA_HOME= config.getProperty("JAVA_HOME");
 			DEPENDENCYFINDER_HOME = config.getProperty("DEPENDENCYFINDER_HOME");
 			DEPENDENCYFINDER_OPTS = config.getProperty("DEPENDENCYFINDER_OPTS");
-			
 		}catch(IOException e){
 			log.error("IOException in opening configuration file " + CONFIGFILE);
 			System.exit(-1);

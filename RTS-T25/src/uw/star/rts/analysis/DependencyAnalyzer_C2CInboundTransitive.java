@@ -1,6 +1,6 @@
 package uw.star.rts.analysis;
 
-import java.io.File;
+import java.io.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,9 +61,9 @@ public class DependencyAnalyzer_C2CInboundTransitive extends DependencyAnalyzer 
 
 		//return all class names in the result xml file , as this result xml file is for the given ClassEntity only
 		List<String> resultLst = new ArrayList<String>();
-		try{
+		try(InputStream stream = Files.newInputStream(finalOutput)){
 			//unmarshal the result xml file
-			Dependencies dp = XMLJAXBUtil.unmarshall(Dependencies.class,Files.newInputStream(finalOutput));
+			Dependencies dp = XMLJAXBUtil.unmarshall(Dependencies.class,stream);
 			if(dp!=null){
 				for(uw.star.rts.analysis.jaxb.Package p: dp.getPackage())
 					for(uw.star.rts.analysis.jaxb.Class cls : p.getClazz())
