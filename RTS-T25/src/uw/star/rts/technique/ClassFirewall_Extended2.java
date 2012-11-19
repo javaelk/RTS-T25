@@ -30,7 +30,7 @@ public class ClassFirewall_Extended2 extends ClassFirewall {
 	 * General procedure:
 	 * 1. Collect code coverage data of v0
 	 * 2. Compare MD5 signatures to produce a list of changed classes between v0 and v1
-	 * 3. Collect dependency data of changed classes 
+	 * 3. Collect dependency data of changed classes.
 	 * 4. Extract test cases that use the change classes or use classes that are directly or transitively dependent on changed classes
 	 * e.g. coverage only needs to analyze on v0.
 	 * this method is assumed to be called in sequence of program versions, i.e. call selectTests(v0,v1) first , then selectTests(v1,v2) etc...

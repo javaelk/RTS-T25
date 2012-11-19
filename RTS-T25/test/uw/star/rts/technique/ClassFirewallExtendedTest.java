@@ -44,6 +44,7 @@ public class ClassFirewallExtendedTest{
 		classFirewalltech.setApplication(app);
 	}
 
+	//test v0-v1 ANT
 	@Test
 	public void testSelectTests3() {
 	ArtifactFactory afactory =new SIRJavaFactory();
@@ -54,8 +55,7 @@ public class ClassFirewallExtendedTest{
 	uw.star.rts.technique.Technique classFirewalltech1 = new ClassFirewall_Extended();
 	classFirewalltech1.setApplication(testapp);
 	List<TestCase> selectedTC = classFirewalltech1.selectTests(v0, v1,new StopWatch());
-	selectedTC = classFirewalltech1.selectTests(v0, v1,new StopWatch());
-	System.out.println("=== test cases selected by ClassFirewall for v6 : " + selectedTC.size() + " ==="); 
+	System.out.println("=== test cases selected by ClassFirewall_Extended for v1 : " + selectedTC.size() + " ==="); 
 	System.out.println(selectedTC);
 	assertEquals("size of selected test cases",28,selectedTC.size());
 	int count =0;
@@ -65,6 +65,8 @@ public class ClassFirewallExtendedTest{
 	System.out.println("selected test cases applicable to version 1 :" + count);
 	assertEquals("Total number of test cases applicable to v1 ",34,testapp.getTestSuite().getTestCaseByVersion(1).size());
 	}
+	
+	//test v5-v6 ANT
 	@Test
 	public void testSelectTests2() {
 	ArtifactFactory afactory =new SIRJavaFactory();
@@ -94,6 +96,7 @@ public class ClassFirewallExtendedTest{
 	assertEquals("Total number of test cases applicable to v6 ",105,testapp.getTestSuite().getTestCaseByVersion(6).size());
 	}
 	
+	//test v0-v1 XML-SECURITY
 	@Test
 	public void testSelectTests() {
 		List<TestCase> selectedTC = classFirewalltech.selectTests(p, pPrime,new StopWatch());
