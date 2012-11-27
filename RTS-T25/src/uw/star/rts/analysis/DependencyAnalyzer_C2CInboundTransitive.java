@@ -1,7 +1,6 @@
 package uw.star.rts.analysis;
 
 import java.io.*;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.exec.CommandLine;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import uw.star.rts.analysis.jaxb.Dependencies;
 import uw.star.rts.artifact.ClassEntity;
@@ -74,7 +75,7 @@ public class DependencyAnalyzer_C2CInboundTransitive extends DependencyAnalyzer 
 		}catch(IOException e){
 			log.error("IOException in reading file " + finalOutput.getFileName());
 			e.printStackTrace();
-		}catch(JAXBException e){
+		}catch(JAXBException| ParserConfigurationException | SAXException e){
 			log.error("JAXBException"+ finalOutput.getFileName());
 			e.printStackTrace();
 		}

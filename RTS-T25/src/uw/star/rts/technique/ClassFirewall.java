@@ -87,10 +87,21 @@ public abstract class ClassFirewall extends Technique {
 		//4. extract test cases that use the change classes or use classes that are directly or transitively dependent on changed classes
 		stopwatch.start(CostFactor.ApplyTechniqueCost);
 		//select test cases that cover changed class entities
-		Set<TestCase> resultSet = new HashSet<TestCase>();		
+		Set<TestCase> selectedTests = new HashSet<TestCase>();		
+		
 		for(ClassEntity ce: dependentClassEntities)
-			resultSet.addAll(classCoverage.getLinkedEntitiesByColumn(ce));
+			selectedTests.addAll(classCoverage.getLinkedEntitiesByColumn(ce));
 		//log.debug("resultSet deep memory usage is "+MemoryUtil.deepMemoryUsageOf(resultSet) + " this should be really small and GCed");
+		
+		//only select tests that were exist in P and are still applicable to pPrime - i.e select from regression suite
+		Set<TestCase> resultSet = new HashSet<>();
+		for(TestCase tc: selectedTests)
+			if(tc.isApplicabletoVersion(p.getVersionNo())&&tc.isApplicabletoVersion(pPrime.getVersionNo())){ 
+				resultSet.add(tc);
+			}else{
+				log.debug("test case " + tc + " is selected, but does not applicable to version " + p.getVersionNo() + " and version " + pPrime.getVersionNo());
+			}
+		
 		stopwatch.stop(CostFactor.ApplyTechniqueCost);
 		return new ArrayList<TestCase>(resultSet);
 	}

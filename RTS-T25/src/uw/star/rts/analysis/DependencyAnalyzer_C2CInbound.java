@@ -10,9 +10,11 @@ import java.nio.file.*;
 import java.util.*;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.exec.*;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 /**
  * This class provides class to class direct inbound dependency information only. It will run DependencyExtractor command from superclass, 
  * then run c2c command to reduce the graph to class level inbound  
@@ -106,7 +108,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 		}catch(IOException e){
 			log.error("IOException in reading file " + xmlfile.getFileName());
 			e.printStackTrace();
-		}catch(JAXBException e){
+		}catch(JAXBException| ParserConfigurationException | SAXException  e){
 			log.error("JAXBException"+ xmlfile.getFileName());
 			e.printStackTrace();
 		}
@@ -140,7 +142,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 		}catch(IOException e){
 			log.error("IOException in reading file " + xmlfile.getFileName());
 			e.printStackTrace();
-		}catch(JAXBException e){
+		}catch(JAXBException | ParserConfigurationException | SAXException e){
 			log.error("JAXBException"+ xmlfile.getFileName());
 			e.printStackTrace();
 		}
@@ -191,7 +193,7 @@ public class DependencyAnalyzer_C2CInbound extends DependencyAnalyzer {
 		}catch(IOException e){
 			log.error("IOException in reading file " + xmlfile.getFileName());
 			e.printStackTrace();
-		}catch(JAXBException e){
+		}catch(JAXBException | ParserConfigurationException | SAXException e){
 			log.error("JAXBException"+ xmlfile.getFileName());
 			e.printStackTrace();
 		}
