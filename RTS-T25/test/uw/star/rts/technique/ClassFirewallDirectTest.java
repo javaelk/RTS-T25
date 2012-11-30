@@ -12,6 +12,7 @@ import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
 import uw.star.rts.artifact.TestCase;
 import uw.star.rts.artifact.TestSuite;
+import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.extraction.ArtifactFactory;
 import uw.star.rts.extraction.SIRJavaFactory;
 import uw.star.rts.util.Constant;
@@ -66,7 +67,7 @@ public class ClassFirewallDirectTest {
 
 	@Test
 	public void testPredictPrecision() {
-		assertEquals("test predict precision", 0.68,classFirewalltech.predictPrecision(),0.11);
+		assertEquals("test predict precision", 0.68,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictor),0.11);
 	}
 
 }

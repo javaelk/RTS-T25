@@ -14,7 +14,9 @@ import uw.star.rts.artifact.TestCase;
 import uw.star.rts.util.StopWatch;
 import uw.star.rts.analysis.*;
 import uw.star.rts.cost.CostFactor;
+import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.cost.RWPrecisionPredictor;
+import uw.star.rts.cost.RWPrecisionPredictor2;
 public abstract class ClassFirewall extends Technique {
 
 	Application testapp;
@@ -142,10 +144,22 @@ public abstract class ClassFirewall extends Technique {
 	 * @return
 	 */
 	@Override
-	public double predictPrecision() {
+	public double predictPrecision(PrecisionPredictionModel pm) {
+
 		Program p = testapp.getProgram(ProgramVariant.orig, 0);
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
-		return RWPrecisionPredictor.getPredicatedPercetageOfTestCaseSelected(cc, testapp.getTestSuite().getTestCaseByVersion(0));
+
+		switch(pm){
+		case RWPredictor:
+			return RWPrecisionPredictor.getPredicatedPercetageOfTestCaseSelected(cc, testapp.getTestSuite().getTestCaseByVersion(0));
+
+		case RWPredictorRegression:
+			return RWPrecisionPredictor2.getPredicatedPercetageOfTestCaseSelected(cc, testapp.getTestSuite().getRegressionTestCasesByVersion(0));
+        
+		default:
+        	log.error("unknow Precision Prediction Model : " + pm);     	
+		}
+		return Double.MIN_VALUE;
 	}
 
 	/**
