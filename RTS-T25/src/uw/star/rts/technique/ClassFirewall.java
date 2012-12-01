@@ -1,6 +1,7 @@
 package uw.star.rts.technique;
 
 
+
 import java.util.*;
 //import com.javamex.classmexer.MemoryUtil;
 import org.slf4j.Logger;
@@ -17,6 +18,9 @@ import uw.star.rts.cost.CostFactor;
 import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.cost.RWPrecisionPredictor;
 import uw.star.rts.cost.RWPrecisionPredictor2;
+import uw.star.rts.cost.RWPrecisionPredictor_multiChanges;
+import org.apache.commons.collections.CollectionUtils;
+
 public abstract class ClassFirewall extends Technique {
 
 	Application testapp;
@@ -133,7 +137,6 @@ public abstract class ClassFirewall extends Technique {
 	 */
 	CodeCoverage<ClassEntity> createCoverage(Program p){
 		CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
-		//this will populate statement entities in source file
 		cca1.extractEntities(EntityType.CLAZZ);
 		CodeCoverage<ClassEntity> classCoverage = cca1.createCodeCoverage(EntityType.CLAZZ);	
 		return classCoverage;
@@ -148,20 +151,41 @@ public abstract class ClassFirewall extends Technique {
 
 		Program p = testapp.getProgram(ProgramVariant.orig, 0);
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
-
+		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(0);
+        List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
+		
 		switch(pm){
 		case RWPredictor:
-			return RWPrecisionPredictor.getPredicatedPercetageOfTestCaseSelected(cc, testapp.getTestSuite().getTestCaseByVersion(0));
+			return RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(0));
 
 		case RWPredictorRegression:
-			return RWPrecisionPredictor2.getPredicatedPercetageOfTestCaseSelected(cc, testapp.getTestSuite().getRegressionTestCasesByVersion(0));
-        
+			return RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests);
+		
+		case RWPrecisionPredictor_multiChanges:
+		//this prediction model would need to know number of changed covered classes (within covered entities)
+		    return RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities).size()); 	
+			
 		default:
         	log.error("unknow Precision Prediction Model : " + pm);     	
 		}
 		return Double.MIN_VALUE;
 	}
 
+	
+	protected Collection<ClassEntity> getModifiedCoveredClassEntities(List<ClassEntity> coveredEntities){
+		//need to extract v1 class entities first 
+		Program v0 = testapp.getProgram(ProgramVariant.orig,0);
+		Program v1 = testapp.getProgram(ProgramVariant.orig,1);
+		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,v1,testapp.getTestSuite());
+		cca2.extractEntities(EntityType.CLAZZ);
+		
+		// find all modified class entities
+		Map<String,List<ClassEntity>> md5DiffResults = MD5ClassChangeAnalyzer.diff(v0, v1);
+		List<ClassEntity> changedClasses = md5DiffResults.get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
+		//intersection of the two is the covered entities that are modified
+		return  CollectionUtils.intersection(coveredEntities, changedClasses);
+	}
+	
 	/**
 	 * For this technique implementation, the total analysis cost is dominant by the cost of finding all transitive dependent classes of changed classes.
 	 * So it should be proportional to number of changed classes and complexity of the code. 

@@ -1,6 +1,7 @@
 package uw.star.rts.technique;
 
 import static org.junit.Assert.*;
+
 import com.javamex.classmexer.MemoryUtil;
 
 import java.io.File;
@@ -128,7 +129,9 @@ public class ClassFirewallExtendedTest{
 	
 	@Test
 	public void testPredictPrecision() {
-		assertEquals("test predict precision", 0.68,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictor),0.11);
+		assertEquals("test predict precision", 0.67,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictor),0.01);
+		assertEquals("test predict precision", 0.67,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictorRegression),0.01);
+		assertEquals("test predict precision", 0.94,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges),0.01);
 	}
 
 }

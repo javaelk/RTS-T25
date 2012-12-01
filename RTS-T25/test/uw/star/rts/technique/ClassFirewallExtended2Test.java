@@ -79,7 +79,9 @@ public class ClassFirewallExtended2Test {
 
 	@Test
 	public void testPredictPrecision() {
-		assertEquals("test predict precision", 0.68,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictor),0.1);
+		assertEquals("test predict precision", 0.67,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictor),0.01);
+		assertEquals("test predict precision", 0.67,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPredictorRegression),0.01);
+		assertEquals("test predict precision", 0.94,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges),0.01);
 	}
 	
 	@Test
