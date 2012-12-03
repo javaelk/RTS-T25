@@ -142,28 +142,26 @@ public abstract class ClassFirewall extends Technique {
 		return classCoverage;
 	}
 	/**
-	 * Precision should be predicted based on first version of the program. 
-	 * Test Suite should only contains test applicable to the first version
+	 * current version is pPrime, previous version is p
 	 * @return
 	 */
 	@Override
-	public double predictPrecision(PrecisionPredictionModel pm) {
+	public double predictPrecision(PrecisionPredictionModel pm,Program p,Program pPrime) {
 
-		Program p = testapp.getProgram(ProgramVariant.orig, 0);
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
-		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(0);
+		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
         List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
 		
 		switch(pm){
 		case RWPredictor:
-			return RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(0));
+			return RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo()));
 
 		case RWPredictorRegression:
 			return RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests);
 		
 		case RWPrecisionPredictor_multiChanges:
 		//this prediction model would need to know number of changed covered classes (within covered entities)
-		    return RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities).size()); 	
+		    return RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()); 	
 			
 		default:
         	log.error("unknow Precision Prediction Model : " + pm);     	
@@ -172,15 +170,14 @@ public abstract class ClassFirewall extends Technique {
 	}
 
 	
-	protected Collection<ClassEntity> getModifiedCoveredClassEntities(List<ClassEntity> coveredEntities){
-		//need to extract v1 class entities first 
-		Program v0 = testapp.getProgram(ProgramVariant.orig,0);
-		Program v1 = testapp.getProgram(ProgramVariant.orig,1);
-		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,v1,testapp.getTestSuite());
+	protected Collection<ClassEntity> getModifiedCoveredClassEntities(List<ClassEntity> coveredEntities,Program p, Program pPrime){
+		CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
+		cca1.extractEntities(EntityType.CLAZZ);
+		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
 		cca2.extractEntities(EntityType.CLAZZ);
 		
 		// find all modified class entities
-		Map<String,List<ClassEntity>> md5DiffResults = MD5ClassChangeAnalyzer.diff(v0, v1);
+		Map<String,List<ClassEntity>> md5DiffResults = MD5ClassChangeAnalyzer.diff(p, pPrime);
 		List<ClassEntity> changedClasses = md5DiffResults.get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
 		//intersection of the two is the covered entities that are modified
 		return  CollectionUtils.intersection(coveredEntities, changedClasses);
