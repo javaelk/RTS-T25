@@ -169,10 +169,49 @@ public abstract class ClassFirewall extends Technique {
 		return Double.MIN_VALUE;
 	}
 
-	
+	/**
+	 * this one is for evaluation purpose and it automatically make predictions on all prediction models 
+	 * this one has better performance than calling predictPrecision(PrecisionPredictionModel pm,Program p,Program pPrime) 3 times.
+	 * @param p
+	 * @param pPrime
+	 * @return
+	 */
+	@Override
+	public Map<PrecisionPredictionModel,Double> predictPrecision(Program p,Program pPrime) {
+
+		Map<PrecisionPredictionModel,Double> results = new HashMap<>();
+
+		CodeCoverage<ClassEntity> cc = createCoverage(p);
+		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
+		List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
+
+		for(PrecisionPredictionModel pm: PrecisionPredictionModel.values()){
+
+			switch(pm){
+			case RWPredictor:
+				results.put(PrecisionPredictionModel.RWPredictor, RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo())));
+				break;
+
+			case RWPredictorRegression:
+				results.put(PrecisionPredictionModel.RWPredictorRegression,RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests));
+				break;
+
+			case RWPrecisionPredictor_multiChanges:
+				//this prediction model would need to know number of changed covered classes (within covered entities)
+				results.put(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges,RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()));
+				break;
+
+			default:
+				log.error("unknow Precision Prediction Model : " + pm);     	
+			}
+		}
+		return results;
+
+	}
 	protected Collection<ClassEntity> getModifiedCoveredClassEntities(List<ClassEntity> coveredEntities,Program p, Program pPrime){
-		CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
-		cca1.extractEntities(EntityType.CLAZZ);
+/*	TODO: already extracted here?	need a way to know if it's already available.
+ * CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
+		cca1.extractEntities(EntityType.CLAZZ);*/
 		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
 		cca2.extractEntities(EntityType.CLAZZ);
 		

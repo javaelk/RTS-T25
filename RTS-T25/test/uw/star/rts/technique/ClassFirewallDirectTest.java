@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -75,5 +77,17 @@ public class ClassFirewallDirectTest {
 		assertEquals("test predict precision", 0.56,classFirewalltech.predictPrecision(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges,pPrime,v2),0.01);
 		
 	}
-
+	@Test
+	public void testPredictPrecisionMap() {
+		Map<PrecisionPredictionModel,Double> p1Prediction = classFirewalltech.predictPrecision(p, pPrime);
+		assertEquals("test predict precision", 0.67,p1Prediction.get(PrecisionPredictionModel.RWPredictor),0.01);
+		assertEquals("test predict precision", 0.67,p1Prediction.get(PrecisionPredictionModel.RWPredictorRegression),0.01);
+		assertEquals("test predict precision", 0.94,p1Prediction.get(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges),0.01);
+		
+		Map<PrecisionPredictionModel,Double> p2Prediction = classFirewalltech.predictPrecision(pPrime,v2);
+		assertEquals("test predict precision", 0.65,p2Prediction.get(PrecisionPredictionModel.RWPredictor),0.01);
+		assertEquals("test predict precision", 0.65,p2Prediction.get(PrecisionPredictionModel.RWPredictorRegression),0.01);
+		assertEquals("test predict precision", 0.56,p2Prediction.get(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges),0.01);
+		
+	}
 }
