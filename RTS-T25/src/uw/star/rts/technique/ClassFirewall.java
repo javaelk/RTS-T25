@@ -55,10 +55,10 @@ public abstract class ClassFirewall extends Technique {
 			//log.debug("p0 deep memory usage is "+MemoryUtil.deepMemoryUsageOf(p0) + " this should keep the same size over the course of all versions");
 		}else{//just extract all class entities of p and pPrime before comparison
 			log.info("extract class entities");
-			CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
+			CodeCoverageAnalyzer cca1 = new JacocoCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
 			cca1.extractEntities(EntityType.CLAZZ);
 		}
-		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca2 = new JacocoCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
 		cca2.extractEntities(EntityType.CLAZZ);
 		
 		stopwatch.stop(CostFactor.CoverageAnalysisCost);
@@ -136,8 +136,7 @@ public abstract class ClassFirewall extends Technique {
 	 * Helper method as this will be called twice. once for predicting cost, once for actual selecting tests. 
 	 */
 	CodeCoverage<ClassEntity> createCoverage(Program p){
-		CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
-		cca1.extractEntities(EntityType.CLAZZ);
+		CodeCoverageAnalyzer cca1 = new JacocoCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
 		CodeCoverage<ClassEntity> classCoverage = cca1.createCodeCoverage(EntityType.CLAZZ);	
 		return classCoverage;
 	}
@@ -212,7 +211,7 @@ public abstract class ClassFirewall extends Technique {
 /*	TODO: already extracted here?	need a way to know if it's already available.
  * CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
 		cca1.extractEntities(EntityType.CLAZZ);*/
-		CodeCoverageAnalyzer cca2 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca2 = new JacocoCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
 		cca2.extractEntities(EntityType.CLAZZ);
 		
 		// find all modified class entities
