@@ -150,7 +150,24 @@ public abstract class ClassFirewall extends Technique {
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
 		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
         List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
-		
+        
+		//merge dependent information into cc before pass to predictor,
+        //this is the beginning of h3 experiment
+        /**
+         * for each entity e in coverage matrix
+         *    find all entities dependents on e (inbound dependent)  - eDependents
+         *    for each entity e' in eDependent
+         *       merge test cases covers e' into e
+         *    end of for
+         *  end of for  
+         */
+        DependencyAnalyzer_C2CInboundTransitive dp = new DependencyAnalyzer_C2CInboundTransitive();
+        for(ClassEntity ce : cc.getColumns()){
+        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
+        	cc.transform(ce,eDependent);
+        }
+        //this is the end of h3 experiment
+        
 		switch(pm){
 		case RWPredictor:
 			return RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo()));
@@ -159,7 +176,7 @@ public abstract class ClassFirewall extends Technique {
 			return RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests);
 		
 		case RWPrecisionPredictor_multiChanges:
-		//this prediction model would need to know number of changed covered classes (within covered entities)
+		//this prediction model would need to know nueDependentEntitiesmber of changed covered classes (within covered entities)
 		    return RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()); 	
 			
 		default:
@@ -183,6 +200,23 @@ public abstract class ClassFirewall extends Technique {
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
 		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
 		List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
+		
+		//merge dependent information into cc before pass to predictor,
+        //this is the beginning of h3 experiment
+        /**
+         * for each entity e in coverage matrix
+         *    find all entities dependents on e (inbound dependent)  - eDependents
+         *    for each entity e' in eDependent
+         *       merge test cases covers e' into e
+         *    end of for
+         *  end of for  
+         */
+        DependencyAnalyzer_C2CInboundTransitive dp = new DependencyAnalyzer_C2CInboundTransitive();
+        for(ClassEntity ce : cc.getColumns()){
+        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
+        	cc.transform(ce,eDependent);
+        }
+        //this is the end of h3 experiment
 
 		for(PrecisionPredictionModel pm: PrecisionPredictionModel.values()){
 
@@ -224,7 +258,7 @@ public abstract class ClassFirewall extends Technique {
 	/**
 	 * For this technique implementation, the total analysis cost is dominant by the cost of finding all transitive dependent classes of changed classes.
 	 * So it should be proportional to number of changed classes and complexity of the code. 
-	 * TODO: track actuals for all programs , corelate #of changes to cost. 
+	 * TODO: track actuals for all programs , correlate #of changes to cost. 
 	 */
 	@Override
 	public long predictAnalysisCost() {
@@ -232,5 +266,6 @@ public abstract class ClassFirewall extends Technique {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
+    
+	
 }
