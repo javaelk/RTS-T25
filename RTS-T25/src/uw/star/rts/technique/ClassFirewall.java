@@ -19,6 +19,8 @@ import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.cost.RWPrecisionPredictor;
 import uw.star.rts.cost.RWPrecisionPredictor2;
 import uw.star.rts.cost.RWPrecisionPredictor_multiChanges;
+import uw.star.rts.cost.RWPredictorCombinesDependency;
+
 import org.apache.commons.collections.CollectionUtils;
 
 public abstract class ClassFirewall extends Technique {
@@ -200,23 +202,6 @@ public abstract class ClassFirewall extends Technique {
 		CodeCoverage<ClassEntity> cc = createCoverage(p);
 		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
 		List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
-		
-		//merge dependent information into cc before pass to predictor,
-        //this is the beginning of h3 experiment
-        /**
-         * for each entity e in coverage matrix
-         *    find all entities dependents on e (inbound dependent)  - eDependents
-         *    for each entity e' in eDependent
-         *       merge test cases covers e' into e
-         *    end of for
-         *  end of for  
-         */
-        DependencyAnalyzer_C2CInboundTransitive dp = new DependencyAnalyzer_C2CInboundTransitive();
-        for(ClassEntity ce : cc.getColumns()){
-        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
-        	cc.transform(ce,eDependent);
-        }
-        //this is the end of h3 experiment
 
 		for(PrecisionPredictionModel pm: PrecisionPredictionModel.values()){
 
@@ -233,7 +218,11 @@ public abstract class ClassFirewall extends Technique {
 				//this prediction model would need to know number of changed covered classes (within covered entities)
 				results.put(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges,RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()));
 				break;
-
+				
+			case RWPredictorCombinesDependency:
+				results.put(PrecisionPredictionModel.RWPredictorCombinesDependency, RWPredictorCombinesDependency.predictSelectionRate(p, cc, regressionTests));
+				break;
+				
 			default:
 				log.error("unknow Precision Prediction Model : " + pm);     	
 			}
