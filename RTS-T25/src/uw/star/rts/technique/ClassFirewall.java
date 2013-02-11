@@ -12,6 +12,7 @@ import uw.star.rts.artifact.EntityType;
 import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
 import uw.star.rts.artifact.TestCase;
+import uw.star.rts.util.DateUtils;
 import uw.star.rts.util.StopWatch;
 import uw.star.rts.analysis.*;
 import uw.star.rts.cost.CostFactor;
@@ -71,7 +72,9 @@ public abstract class ClassFirewall extends Technique {
 		Map<String,List<ClassEntity>> md5DiffResults = MD5ClassChangeAnalyzer.diff(p, pPrime);
 		//log.debug("md5DiffResults deep memory usage is "+MemoryUtil.deepMemoryUsageOf(md5DiffResults) + " this should be really small and GCed");
 		List<ClassEntity> changedClasses = md5DiffResults.get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
+		log.debug("modified classes between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " " + DateUtils.now()+ " total : "+ changedClasses.size() + changedClasses);
 		//log.debug("changedClasses deep memory usage is "+MemoryUtil.deepMemoryUsageOf(changedClasses) + " this should be really small and GCed");
+		
 		
 		log.info("//3. collect dependency data of v" + p.getVersionNo());
 		//TODO: dependent files(xml) are not cleaned from version to version. this could be a problem
@@ -90,6 +93,7 @@ public abstract class ClassFirewall extends Technique {
 			if(classEntityFound!=null) dependentClassEntities.add(classEntityFound); //find classEntity by string name,need to use the p0 instead of current version of the program
 		}
 		//log.debug("dependentClassEntities deep memory usage is "+MemoryUtil.deepMemoryUsageOf(dependentClassEntities) + " this should be really small and GCed");
+		log.debug("modified classes(including dependent classes) between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " " + DateUtils.now()+ " total : "+ dependentClassEntities.size() + dependentClassEntities);
 		stopwatch.stop(CostFactor.ChangeAnalysisCost);
 
 		//4. extract test cases that use the change classes or use classes that are directly or transitively dependent on changed classes
@@ -97,8 +101,15 @@ public abstract class ClassFirewall extends Technique {
 		//select test cases that cover changed class entities
 		Set<TestCase> selectedTests = new HashSet<TestCase>();		
 		
-		for(ClassEntity ce: dependentClassEntities)
-			selectedTests.addAll(classCoverage.getLinkedEntitiesByColumn(ce));
+		int numCoveredandChangedClassEntities = 0;
+		
+		for(ClassEntity ce: dependentClassEntities){
+			List<TestCase> st = classCoverage.getLinkedEntitiesByColumn(ce);
+			if(st.size()!=0) numCoveredandChangedClassEntities++;
+			selectedTests.addAll(selectedTests);
+		}
+		log.debug("modified classes(including dependent classes) and covered between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " total : "+ numCoveredandChangedClassEntities);
+		
 		//log.debug("resultSet deep memory usage is "+MemoryUtil.deepMemoryUsageOf(resultSet) + " this should be really small and GCed");
 		
 		//only select tests that were exist in P and are still applicable to pPrime - i.e select from regression suite
