@@ -11,6 +11,7 @@ import org.slf4j.*;
 import uw.star.rts.analysis.DependencyAnalyzer_C2CInboundTransitive;
 import uw.star.rts.artifact.Application;
 import uw.star.rts.artifact.ClassEntity;
+import uw.star.rts.artifact.CodeCoverage;
 import uw.star.rts.artifact.Program;
 
 public class ClassFirewall_Extended2 extends ClassFirewall {
@@ -40,5 +41,15 @@ public class ClassFirewall_Extended2 extends ClassFirewall {
 
 			dp.analyze(p); 
 			return dp.findDirectAndTransitiveInBoundDependentClasses(changedClassesCurrentVer);
+	}
+	
+	protected CodeCoverage<ClassEntity> combineDependecyInfoIntoCoverage(Program p, CodeCoverage<ClassEntity> cc){
+        CodeCoverage<ClassEntity> ncc = cc;  //make sure original CoverCoverage object is not modified
+    	dp.analyze(p);
+        for(ClassEntity ce : ncc.getColumns()){
+        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
+        	ncc = ncc.transform(ce,eDependent);
+        }
+        return ncc;
 	}
 }

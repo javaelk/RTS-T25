@@ -17,10 +17,11 @@ import uw.star.rts.util.StopWatch;
 import uw.star.rts.analysis.*;
 import uw.star.rts.cost.CostFactor;
 import uw.star.rts.cost.PrecisionPredictionModel;
-import uw.star.rts.cost.RWPrecisionPredictor;
-import uw.star.rts.cost.RWPrecisionPredictor2;
-import uw.star.rts.cost.RWPrecisionPredictor_multiChanges;
+import uw.star.rts.cost.RWPredictor;
+import uw.star.rts.cost.RWPredictor_RegressionTestsOnly;
+import uw.star.rts.cost.RWPredictor_multiChanges;
 import uw.star.rts.cost.RWPredictorCombinesDependency;
+import uw.star.rts.cost.RWPredictor_multiChanges2;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -164,36 +165,23 @@ public abstract class ClassFirewall extends Technique {
 		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
         List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
         
-		//merge dependent information into cc before pass to predictor,
-        //this is the beginning of h3 experiment
-        /**
-         * for each entity e in coverage matrix
-         *    find all entities dependents on e (inbound dependent)  - eDependents
-         *    for each entity e' in eDependent
-         *       merge test cases covers e' into e
-         *    end of for
-         *  end of for  
-         */
-        DependencyAnalyzer_C2CInboundTransitive dp = new DependencyAnalyzer_C2CInboundTransitive();
-        for(ClassEntity ce : cc.getColumns()){
-        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
-        	cc.transform(ce,eDependent);
-        }
-        //this is the end of h3 experiment
-        
 		switch(pm){
 		case RWPredictor:
-			return RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo()));
+			return RWPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo()));
 
-		case RWPredictorRegression:
-			return RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests);
+		case RWPredictor_RegressionTestsOnly:
+			return RWPredictor_RegressionTestsOnly.predictSelectionRate(cc,regressionTests);
 		
-		case RWPrecisionPredictor_multiChanges:
-		//this prediction model would need to know nueDependentEntitiesmber of changed covered classes (within covered entities)
-		    return RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()); 	
-			
+		case RWPredictor_multiChanges:
+		//this prediction model would need to know number of changed covered classes (within covered entities)
+		    return RWPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()); 	
+
+		case RWPredictor_multiChanges2:
+			return RWPredictor_multiChanges2.predictSelectionRate(cc, testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo()),getModifiedClassEntities(p,pPrime).size());
+	
+			//TODO: need to add all combinesDependency models
 		default:
-        	log.error("unknow Precision Prediction Model : " + pm);     	
+        	log.warn("unknow Precision Prediction Model : " + pm);     	
 		}
 		return Double.MIN_VALUE;
 	}
@@ -209,30 +197,57 @@ public abstract class ClassFirewall extends Technique {
 	public Map<PrecisionPredictionModel,Double> predictPrecision(Program p,Program pPrime) {
 
 		Map<PrecisionPredictionModel,Double> results = new HashMap<>();
-
-		CodeCoverage<ClassEntity> cc = createCoverage(p);
 		List<TestCase> regressionTests = testapp.getTestSuite().getRegressionTestCasesByVersion(p.getVersionNo());
-		List<ClassEntity> regressionTestCoveredEntities = cc.getCoveredEntities(regressionTests);
+		
+		CodeCoverage<ClassEntity> cc = createCoverage(p);
+		CodeCoverage<ClassEntity> cc_combinesDependencyInfo = combineDependecyInfoIntoCoverage(p,cc);
+		
+		List<ClassEntity> regressionTestCoveredEntities1 = cc.getCoveredEntities(regressionTests);
+		List<ClassEntity> regressionTestCoveredEntities2 = cc_combinesDependencyInfo.getCoveredEntities(regressionTests);
 
-		for(PrecisionPredictionModel pm: PrecisionPredictionModel.values()){
+		List<ClassEntity> modifiedClassEntities = getModifiedClassEntities(p,pPrime);
+        
+ 		for(PrecisionPredictionModel pm: PrecisionPredictionModel.values()){
 
 			switch(pm){
 			case RWPredictor:
-				results.put(PrecisionPredictionModel.RWPredictor, RWPrecisionPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo())));
+				results.put(PrecisionPredictionModel.RWPredictor, RWPredictor.predictSelectionRate(cc, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo())));
 				break;
 
-			case RWPredictorRegression:
-				results.put(PrecisionPredictionModel.RWPredictorRegression,RWPrecisionPredictor2.predictSelectionRate(cc,regressionTests));
+			case RWPredictor_CombinesClassDependency:
+				results.put(PrecisionPredictionModel.RWPredictor_CombinesClassDependency, RWPredictor.predictSelectionRate(cc_combinesDependencyInfo, testapp.getTestSuite().getTestCaseByVersion(p.getVersionNo())));
 				break;
 
-			case RWPrecisionPredictor_multiChanges:
+			case RWPredictor_RegressionTestsOnly:
+				results.put(PrecisionPredictionModel.RWPredictor_RegressionTestsOnly,
+						RWPredictor_RegressionTestsOnly.predictSelectionRate(cc,regressionTests));
+				break;
+
+			case RWPredictor_RegressionTestsOnly_CombinesClassDependency:
+				results.put(PrecisionPredictionModel.RWPredictor_RegressionTestsOnly_CombinesClassDependency,
+						RWPredictor_RegressionTestsOnly.predictSelectionRate(cc_combinesDependencyInfo,regressionTests));
+				break;
+
+			case RWPredictor_multiChanges:
 				//this prediction model would need to know number of changed covered classes (within covered entities)
-				results.put(PrecisionPredictionModel.RWPrecisionPredictor_multiChanges,RWPrecisionPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities.size(), getModifiedCoveredClassEntities(regressionTestCoveredEntities,p,pPrime).size()));
+				results.put(PrecisionPredictionModel.RWPredictor_multiChanges,
+						RWPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities1.size(), CollectionUtils.intersection(regressionTestCoveredEntities1,modifiedClassEntities).size()));
 				break;
+
+			case RWPredictor_multiChanges_CombinesClassDependency:
+				//this prediction model would need to know number of changed covered classes (within covered entities)
 				
-			case RWPredictorCombinesDependency:
-				results.put(PrecisionPredictionModel.RWPredictorCombinesDependency, RWPredictorCombinesDependency.predictSelectionRate(p, cc, regressionTests));
+				results.put(PrecisionPredictionModel.RWPredictor_multiChanges_CombinesClassDependency,
+						RWPredictor_multiChanges.predictSelectionRate(regressionTestCoveredEntities2.size(), CollectionUtils.intersection(regressionTestCoveredEntities2,modifiedClassEntities).size()));
 				break;
+
+			case RWPredictor_multiChanges2:
+				results.put(PrecisionPredictionModel.RWPredictor_multiChanges2,
+						RWPredictor_multiChanges2.predictSelectionRate(cc, regressionTests,modifiedClassEntities.size()));
+		
+			case RWPredictor_multiChanges2_CombinesClassDependency:
+				results.put(PrecisionPredictionModel.RWPredictor_multiChanges2_CombinesClassDependency,
+						RWPredictor_multiChanges2.predictSelectionRate(cc_combinesDependencyInfo, regressionTests,modifiedClassEntities.size()));
 				
 			default:
 				log.error("unknow Precision Prediction Model : " + pm);     	
@@ -242,19 +257,20 @@ public abstract class ClassFirewall extends Technique {
 
 	}
 	protected Collection<ClassEntity> getModifiedCoveredClassEntities(List<ClassEntity> coveredEntities,Program p, Program pPrime){
-/*	TODO: already extracted here?	need a way to know if it's already available.
- * CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
+		//intersection of the two is the covered entities that are modified
+		return  CollectionUtils.intersection(coveredEntities, getModifiedClassEntities(p,pPrime));
+	}
+	
+	protected List<ClassEntity> getModifiedClassEntities(Program p, Program pPrime){
+		/*	TODO: already extracted here?	need a way to know if it's already available.
+		 * CodeCoverageAnalyzer cca1 = new EmmaCodeCoverageAnalyzer(testapp.getRepository(),testapp,p,testapp.getTestSuite());
 		cca1.extractEntities(EntityType.CLAZZ);*/
 		CodeCoverageAnalyzer cca2 = new JacocoCodeCoverageAnalyzer(testapp.getRepository(),testapp,pPrime,testapp.getTestSuite());
 		cca2.extractEntities(EntityType.CLAZZ);
-		
-		// find all modified class entities
-		Map<String,List<ClassEntity>> md5DiffResults = MD5ClassChangeAnalyzer.diff(p, pPrime);
-		List<ClassEntity> changedClasses = md5DiffResults.get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
-		//intersection of the two is the covered entities that are modified
-		return  CollectionUtils.intersection(coveredEntities, changedClasses);
+
+		return MD5ClassChangeAnalyzer.diff(p, pPrime).get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
 	}
-	
+
 	/**
 	 * For this technique implementation, the total analysis cost is dominant by the cost of finding all transitive dependent classes of changed classes.
 	 * So it should be proportional to number of changed classes and complexity of the code. 
@@ -267,5 +283,14 @@ public abstract class ClassFirewall extends Technique {
 		return 0;
 	}
     
-	
+	//merge dependent information into cc before pass to predictor,
+    /**
+     * for each entity e in coverage matrix
+     *    find all entities dependents on e (inbound dependent)  - eDependents
+     *    for each entity e' in eDependent
+     *       merge test cases covers e' into e
+     *    end of for
+     *  end of for  
+     */
+	abstract CodeCoverage<ClassEntity> combineDependecyInfoIntoCoverage(Program p, CodeCoverage<ClassEntity> cc);
 }
