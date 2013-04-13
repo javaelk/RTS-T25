@@ -107,7 +107,7 @@ public abstract class ClassFirewall extends Technique {
 		for(ClassEntity ce: dependentClassEntities){
 			List<TestCase> st = classCoverage.getLinkedEntitiesByColumn(ce);
 			if(st.size()!=0) numCoveredandChangedClassEntities++;
-			selectedTests.addAll(selectedTests);
+			selectedTests.addAll(st);
 		}
 		log.debug("modified classes(including dependent classes) and covered between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " total : "+ numCoveredandChangedClassEntities);
 		
@@ -244,10 +244,12 @@ public abstract class ClassFirewall extends Technique {
 			case RWPredictor_multiChanges2:
 				results.put(PrecisionPredictionModel.RWPredictor_multiChanges2,
 						RWPredictor_multiChanges2.predictSelectionRate(cc, regressionTests,modifiedClassEntities.size()));
-		
+		       break;
+		       
 			case RWPredictor_multiChanges2_CombinesClassDependency:
 				results.put(PrecisionPredictionModel.RWPredictor_multiChanges2_CombinesClassDependency,
 						RWPredictor_multiChanges2.predictSelectionRate(cc_combinesDependencyInfo, regressionTests,modifiedClassEntities.size()));
+				break;
 				
 			default:
 				log.error("unknow Precision Prediction Model : " + pm);     	
