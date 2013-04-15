@@ -43,12 +43,12 @@ public class MD5ClassChangeAnalyzerTest {
 		
 		Program p0 = testapp.getProgram(ProgramVariant.orig, 0);
 		Program p1= testapp.getProgram(ProgramVariant.orig, 1);
-		CodeCoverageAnalyzer cca1 = new JacocoCodeCoverageAnalyzer(af,testapp,p0,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca1 =  CodeCoverageAnalyzerFactory.create(af,testapp,p0,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca1.extractEntities(EntityType.SOURCE);
 		cca1.extractEntities(EntityType.CLAZZ);
 		
-		CodeCoverageAnalyzer cca2 = new JacocoCodeCoverageAnalyzer(af,testapp,p1,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca2 =  CodeCoverageAnalyzerFactory.create(af,testapp,p1,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca2.extractEntities(EntityType.SOURCE);
 		cca2.extractEntities(EntityType.CLAZZ);
@@ -80,12 +80,12 @@ public class MD5ClassChangeAnalyzerTest {
 		
 		Program p5 = testapp.getProgram(ProgramVariant.orig, 5);
 		Program p6= testapp.getProgram(ProgramVariant.orig, 6);
-		CodeCoverageAnalyzer cca5 = new JacocoCodeCoverageAnalyzer(af,testapp,p5,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca5 = CodeCoverageAnalyzerFactory.create(af,testapp,p5,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca1.extractEntities(EntityType.SOURCE);
 		cca5.extractEntities(EntityType.CLAZZ);
 		
-		CodeCoverageAnalyzer cca6 = new JacocoCodeCoverageAnalyzer(af,testapp,p6,testapp.getTestSuite());
+		CodeCoverageAnalyzer cca6 = CodeCoverageAnalyzerFactory.create(af,testapp,p6,testapp.getTestSuite());
 		//this will populate statementeentities in source file, required before comparing two source files for line differences.
 		//cca2.extractEntities(EntityType.SOURCE);
 		cca6.extractEntities(EntityType.CLAZZ);
