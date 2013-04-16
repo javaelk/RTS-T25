@@ -20,6 +20,7 @@ import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
 import uw.star.rts.artifact.TestCase;
 import uw.star.rts.artifact.TestSuite;
+import uw.star.rts.artifact.TraceType;
 import uw.star.rts.cost.CostFactor;
 import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.extraction.ArtifactFactory;
@@ -40,7 +41,7 @@ public class ClassFirewallExtended2Test {
 	public static void oneTimeSetUp() throws Exception {
 		ArtifactFactory af =new SIRJavaFactory();
 		af.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-		app = af.extract("apache-xml-security");
+		app = af.extract("apache-xml-security",TraceType.CODECOVERAGE_EMMA);
 
 		p=app.getProgram(ProgramVariant.orig, 0);
 		pPrime=app.getProgram(ProgramVariant.orig, 1);

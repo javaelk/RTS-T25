@@ -16,6 +16,7 @@ import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
 import uw.star.rts.artifact.TestCase;
 import uw.star.rts.artifact.TestSuite;
+import uw.star.rts.artifact.TraceType;
 import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.extraction.ArtifactFactory;
 import uw.star.rts.extraction.SIRJavaFactory;
@@ -36,7 +37,7 @@ public class ClassFirewallExtendedTest{
 	public static void oneTimeSetUp() throws Exception {
 		ArtifactFactory af =new SIRJavaFactory();
 		af.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-		app = af.extract("apache-xml-security");
+		app = af.extract("apache-xml-security",TraceType.CODECOVERAGE_EMMA);
 
 		p=app.getProgram(ProgramVariant.orig, 0);
 		pPrime=app.getProgram(ProgramVariant.orig, 1);
@@ -51,7 +52,7 @@ public class ClassFirewallExtendedTest{
 	public void testSelectTests3() {
 	ArtifactFactory afactory =new SIRJavaFactory();
 	afactory.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-	Application testapp = afactory.extract("apache-ant");
+	Application testapp = afactory.extract("apache-ant",TraceType.CODECOVERAGE_EMMA);
 	Program v0=testapp.getProgram(ProgramVariant.orig, 0);
 	Program v1=testapp.getProgram(ProgramVariant.orig, 1);
 	uw.star.rts.technique.Technique classFirewalltech1 = new ClassFirewall_Extended();
@@ -73,7 +74,7 @@ public class ClassFirewallExtendedTest{
 	public void testSelectTests2() {
 	ArtifactFactory afactory =new SIRJavaFactory();
 	afactory.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-	Application testapp = afactory.extract("apache-ant");
+	Application testapp = afactory.extract("apache-ant",TraceType.CODECOVERAGE_EMMA);
 	Program v0=testapp.getProgram(ProgramVariant.orig, 0);
 	Program v1=testapp.getProgram(ProgramVariant.orig, 1);
 	Program v5=testapp.getProgram(ProgramVariant.orig, 5);

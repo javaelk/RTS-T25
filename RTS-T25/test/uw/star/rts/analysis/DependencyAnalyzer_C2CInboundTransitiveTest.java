@@ -13,6 +13,7 @@ import org.junit.Test;
 import uw.star.rts.artifact.Application;
 import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
+import uw.star.rts.artifact.TraceType;
 import uw.star.rts.extraction.ArtifactFactory;
 import uw.star.rts.extraction.SIRJavaFactory;
 import uw.star.rts.util.Constant;
@@ -27,7 +28,7 @@ public class DependencyAnalyzer_C2CInboundTransitiveTest {
 	public static void oneTimeSetUp(){
 		ArtifactFactory af =new SIRJavaFactory();
 		af.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-		Application app = af.extract("apache-ant");
+		Application app = af.extract("apache-ant",TraceType.CODECOVERAGE_EMMA);
 		v2=app.getProgram(ProgramVariant.orig, 2);
 
 	}

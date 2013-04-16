@@ -16,6 +16,7 @@ import uw.star.rts.artifact.Application;
 import uw.star.rts.artifact.ClassEntity;
 import uw.star.rts.artifact.Program;
 import uw.star.rts.artifact.ProgramVariant;
+import uw.star.rts.artifact.TraceType;
 import uw.star.rts.extraction.ArtifactFactory;
 import uw.star.rts.extraction.SIRJavaFactory;
 import uw.star.rts.util.Constant;
@@ -30,7 +31,7 @@ public class DependencyAnalyzer_C2CInboundTest {
 	public static void oneTimeSetUp(){
 		ArtifactFactory af =new SIRJavaFactory();
 		af.setExperimentRoot(PropertyUtil.getPropertyByName("config"+File.separator+"ARTSConfiguration.property",Constant.EXPERIMENTROOT));
-		Application app = af.extract("apache-xml-security");
+		Application app = af.extract("apache-xml-security",TraceType.CODECOVERAGE_EMMA);
 		v0=app.getProgram(ProgramVariant.orig, 0);
 		v1=app.getProgram(ProgramVariant.orig, 1);
 		da = new DependencyAnalyzer_C2CInbound();

@@ -39,7 +39,7 @@ public class MD5ClassChangeAnalyzerTest {
 	
 	@Test
 	public void diffTest(){
-		Application testapp = af.extract("apache-ant");
+		Application testapp = af.extract("apache-ant",TraceType.CODECOVERAGE_EMMA);
 		
 		Program p0 = testapp.getProgram(ProgramVariant.orig, 0);
 		Program p1= testapp.getProgram(ProgramVariant.orig, 1);

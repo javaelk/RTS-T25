@@ -48,7 +48,7 @@ public class DependencyAnalyzerTest {
 	@Test
 	public void testAnalyze(){
 
-		Application app = af.extract("apache-xml-security");
+		Application app = af.extract("apache-xml-security",TraceType.CODECOVERAGE_EMMA);
 		Program v1=app.getProgram(ProgramVariant.orig, 1);
 		DependencyAnalyzer da = new DependencyAnalyzer();
 		da.analyze(v1);
