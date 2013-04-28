@@ -1,8 +1,13 @@
 package uw.star.rts.analysis;
 import java.nio.file.*;
 import uw.star.rts.artifact.*;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.*;
 
 import com.google.common.hash.*;
@@ -69,7 +74,8 @@ public  class MD5ClassChangeAnalyzer {
 	
 
 	/**
-	 * compare whether 2 files have different MD5 hash
+	 * compare whether 2 files have different MD5 hash.
+	 * use Google Hashing function as the primary result, but also compare with other methods to be sure.
 	 * @param f0
 	 * @param f1
 	 * @return true if files have the same MD5 digest, false otherwise. If any of the files can not be opened, return false
@@ -78,10 +84,10 @@ public  class MD5ClassChangeAnalyzer {
 		if(Files.exists(f0)&&Files.exists(f1)){
 			try(InputStream s0 =Files.newInputStream(f0);
 				InputStream s1 =Files.newInputStream(f1);	){
-				HashFunction hf = Hashing.md5(); //this can be reused
-				HashCode hc0 = hf.newHasher().putBytes(ByteStreams.toByteArray(s0)).hash();
-				HashCode hc1 = hf.newHasher().putBytes(ByteStreams.toByteArray(s1)).hash();
-				return hc0.equals(hc1);
+				boolean result = googelHashing(s0,s1);
+				if(result!=javaMessageDigest(s0,s1)||result!=apacheCommons(s0,s1))
+					log.error("MD5 hashing error - hashing results are different for " + f0 + " and " + f1);
+				return result;
 			}catch(IOException e){
 				log.error("Error opening file " + f0 + " or " + f1);
 			}
@@ -90,5 +96,32 @@ public  class MD5ClassChangeAnalyzer {
 		}
 
 		return false;
+	}
+	
+	private static boolean googelHashing(InputStream s0,InputStream s1) throws IOException{
+		HashFunction hf = Hashing.md5(); //this can be reused
+		HashCode hc0 = hf.newHasher().putBytes(ByteStreams.toByteArray(s0)).hash();
+		HashCode hc1 = hf.newHasher().putBytes(ByteStreams.toByteArray(s1)).hash();
+		return hc0.equals(hc1);
+		
+	}
+	
+	private static boolean javaMessageDigest(InputStream s0,InputStream s1) throws IOException{
+
+		try {
+			MessageDigest md1 = MessageDigest.getInstance("MD5");
+			String ss0 = Hex.encodeHexString(md1.digest(ByteStreams.toByteArray(s0)));
+			MessageDigest md2 = MessageDigest.getInstance("MD5");
+			String ss1 = Hex.encodeHexString(md2.digest(ByteStreams.toByteArray(s1)));
+			return ss0.equals(ss1);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	private static boolean apacheCommons(InputStream s0,InputStream s1) throws IOException{
+		return DigestUtils.md5Hex(s0).equals(DigestUtils.md5Hex(s1));
 	}
 }
