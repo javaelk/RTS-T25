@@ -3,15 +3,15 @@ import java.nio.file.*;
 import uw.star.rts.artifact.*;
 import java.util.*;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.*;
+
+import com.google.common.hash.*;
+import com.google.common.io.ByteStreams;
+
 import java.io.*;
 /**
  * This class compute differences between versions of the program to identify changed classes. The class is implemented by comparing
- * MD5 digest(hash) of the two class files. This class uses Apache Commons Codec library
- * @see http://commons.apache.org/codec/api-release/org/apache/commons/codec/digest/DigestUtils.html 
- * @see http://commons.apache.org/codec/
- *  
+*  
  * @author Weining Liu
  *
  */
@@ -78,9 +78,10 @@ public  class MD5ClassChangeAnalyzer {
 		if(Files.exists(f0)&&Files.exists(f1)){
 			try(InputStream s0 =Files.newInputStream(f0);
 				InputStream s1 =Files.newInputStream(f1);	){
-				String f0md5 = DigestUtils.md5Hex(s0);
-				String f1md5 = DigestUtils.md5Hex(s1);
-				return f0md5.equals(f1md5);
+				HashFunction hf = Hashing.md5(); //this can be reused
+				HashCode hc0 = hf.newHasher().putBytes(ByteStreams.toByteArray(s0)).hash();
+				HashCode hc1 = hf.newHasher().putBytes(ByteStreams.toByteArray(s1)).hash();
+				return hc0.equals(hc1);
 			}catch(IOException e){
 				log.error("Error opening file " + f0 + " or " + f1);
 			}

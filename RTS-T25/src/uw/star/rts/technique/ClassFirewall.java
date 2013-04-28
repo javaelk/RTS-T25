@@ -80,6 +80,7 @@ public abstract class ClassFirewall extends Technique {
 		log.info("//3. collect dependency data of v" + p.getVersionNo());
 		//TODO: dependent files(xml) are not cleaned from version to version. this could be a problem
 		Map<ClassEntity,List<String>> dependentClassesMap = collectDependentInformation(p,changedClasses);
+		log.debug("dependent class map for p"+p.getVersionNo()+" is " + dependentClassesMap.toString());
 		//log.debug("dependentClassesMap deep memory usage is "+MemoryUtil.deepMemoryUsageOf(dependentClassesMap) + " this should be really small and GCed");
 		
 		/*TODO: would be better if this can be changed
