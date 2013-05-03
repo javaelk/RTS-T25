@@ -50,9 +50,9 @@ public class ClassFirewall_Direct extends ClassFirewall {
 	protected CodeCoverage<ClassEntity> combineDependecyInfoIntoCoverage(Program p, CodeCoverage<ClassEntity> cc){
 		CodeCoverage<ClassEntity> ncc = cc;  //make sure original CoverCoverage object is not modified
 		dp.analyze(p);
-        for(ClassEntity ce : ncc.getColumns()){
+        for(ClassEntity ce : cc.getColumns()){
         	List<String> eDependent = dp.findDirectDependentClasses(ce.getName());
-        	ncc.transform(ce,eDependent);
+        	ncc = ncc.transform(ce,eDependent);
         }
         return ncc;
 	}

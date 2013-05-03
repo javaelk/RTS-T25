@@ -36,10 +36,10 @@ public class MD5ClassChangeAnalyzerTest {
 		Paths.get(EXPERIMENT_ROOT+"/apache-ant/versions.alt/orig/v1/ant/build/classes/org/apache/tools/ant/FileScanner.class"),
 		Paths.get(EXPERIMENT_ROOT+"/apache-ant/versions.alt/orig/v0/ant/build/classes/org/apache/tools/ant/FileScanner.class")));
 		
-		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
+/*		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
 				Paths.get("/home/wliu/archive/commentsRemoved/jacoco_core/versions.alt/orig/v0/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class"),
 				Paths.get("/home/wliu/archive/commentsRemoved/jacoco_core/versions.alt/orig/v1/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class")));
-		
+*/		
 		assertFalse(MD5ClassChangeAnalyzer.hasSameMD5Digest(
 				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v0/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class"),
 				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v1/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class")));

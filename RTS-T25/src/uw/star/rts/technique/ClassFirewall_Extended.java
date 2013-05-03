@@ -120,11 +120,11 @@ public class ClassFirewall_Extended extends ClassFirewall {
      *  end of for  
      */
 	protected CodeCoverage<ClassEntity> combineDependecyInfoIntoCoverage(Program p, CodeCoverage<ClassEntity> cc){
-		CodeCoverage<ClassEntity> ncc = cc;  //make sure original CoverCoverage object is not modified
+		CodeCoverage<ClassEntity> ncc = cc;    
 		dp.analyze(p);
-        for(ClassEntity ce : ncc.getColumns()){
+        for(ClassEntity ce : cc.getColumns()){
         	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
-        	ncc.transform(ce,eDependent);
+        	ncc = ncc.transform(ce,eDependent);//original CoverCoverage object is not modified, a new codeCoverage matrix is returned
         }
         return ncc;
 	}
