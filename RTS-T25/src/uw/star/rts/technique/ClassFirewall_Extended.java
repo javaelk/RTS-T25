@@ -122,9 +122,14 @@ public class ClassFirewall_Extended extends ClassFirewall {
 	protected CodeCoverage<ClassEntity> combineDependecyInfoIntoCoverage(Program p, CodeCoverage<ClassEntity> cc){
 		CodeCoverage<ClassEntity> ncc = cc;    
 		dp.analyze(p);
-        for(ClassEntity ce : cc.getColumns()){
-        	List<String> eDependent = dp.findDirectAndTransitiveInBoundDependentClasses(ce.getName());
-        	ncc = ncc.transform(ce,eDependent);//original CoverCoverage object is not modified, a new codeCoverage matrix is returned
+		Map<ClassEntity, List<String>> dependentClassesMap = dp.findDirectAndTransitiveInBoundDependentClasses(cc.getColumns());
+        for(ClassEntity ce : dependentClassesMap.keySet()){
+        	List<String> eDependent = dependentClassesMap.get(ce);
+        	if(eDependent.isEmpty()){
+        		log.debug("no class dependent on " + ce.getClassName());
+        	}else{
+        			ncc = ncc.transform(ce,eDependent);//original CoverCoverage object is not modified, a new codeCoverage matrix is returned
+        	}        			
         }
         return ncc;
 	}

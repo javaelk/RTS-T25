@@ -20,7 +20,6 @@ import uw.star.rts.cost.PrecisionPredictionModel;
 import uw.star.rts.cost.RWPredictor;
 import uw.star.rts.cost.RWPredictor_RegressionTestsOnly;
 import uw.star.rts.cost.RWPredictor_multiChanges;
-import uw.star.rts.cost.RWPredictorCombinesDependency;
 import uw.star.rts.cost.RWPredictor_multiChanges2;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -75,9 +74,10 @@ public abstract class ClassFirewall extends Technique {
 		List<ClassEntity> changedClasses = md5DiffResults.get(MD5ClassChangeAnalyzer.MODIFIED_CLASSENTITY_KEY);
 		log.debug("modified classes between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " " + DateUtils.now()+ " total : "+ changedClasses.size() + changedClasses);
 		//log.debug("changedClasses deep memory usage is "+MemoryUtil.deepMemoryUsageOf(changedClasses) + " this should be really small and GCed");
-		
+		stopwatch.stop(CostFactor.ChangeAnalysisCost);
 		
 		log.info("//3. collect dependency data of v" + p.getVersionNo());
+		stopwatch.start(CostFactor.DependencyAnalysisCost);
 		//TODO: dependent files(xml) are not cleaned from version to version. this could be a problem
 		Map<ClassEntity,List<String>> dependentClassesMap = collectDependentInformation(p,changedClasses);
 		log.debug("dependent class map for p"+p.getVersionNo()+" is " + dependentClassesMap.toString());
@@ -96,7 +96,7 @@ public abstract class ClassFirewall extends Technique {
 		}
 		//log.debug("dependentClassEntities deep memory usage is "+MemoryUtil.deepMemoryUsageOf(dependentClassEntities) + " this should be really small and GCed");
 		log.debug("modified classes(including dependent classes) between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " " + DateUtils.now()+ " total : "+ dependentClassEntities.size() + dependentClassEntities);
-		stopwatch.stop(CostFactor.ChangeAnalysisCost);
+		stopwatch.stop(CostFactor.DependencyAnalysisCost);
 
 		//4. extract test cases that use the change classes or use classes that are directly or transitively dependent on changed classes
 		stopwatch.start(CostFactor.ApplyTechniqueCost);
