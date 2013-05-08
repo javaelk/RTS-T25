@@ -97,7 +97,8 @@ public abstract class ClassFirewall extends Technique {
 		//log.debug("dependentClassEntities deep memory usage is "+MemoryUtil.deepMemoryUsageOf(dependentClassEntities) + " this should be really small and GCed");
 		log.debug("modified classes(including dependent classes) between p"+p.getVersionNo() + " and p"+ pPrime.getVersionNo()+ " " + DateUtils.now()+ " total : "+ dependentClassEntities.size() + dependentClassEntities);
 		stopwatch.stop(CostFactor.DependencyAnalysisCost);
-
+		log.debug("Dependent analysis cost is " + stopwatch.getElapsedTime(CostFactor.DependencyAnalysisCost) + " ms");
+		
 		//4. extract test cases that use the change classes or use classes that are directly or transitively dependent on changed classes
 		stopwatch.start(CostFactor.ApplyTechniqueCost);
 		//select test cases that cover changed class entities
@@ -124,6 +125,7 @@ public abstract class ClassFirewall extends Technique {
 			}
 		
 		stopwatch.stop(CostFactor.ApplyTechniqueCost);
+
 		return new ArrayList<TestCase>(resultSet);
 	}
     
