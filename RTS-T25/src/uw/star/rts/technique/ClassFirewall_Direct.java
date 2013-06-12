@@ -52,7 +52,11 @@ public class ClassFirewall_Direct extends ClassFirewall {
 		dp.analyze(p);
         for(ClassEntity ce : cc.getColumns()){
         	List<String> eDependent = dp.findDirectDependentClasses(ce.getName());
-        	ncc = ncc.transform(ce,eDependent);
+        	if(eDependent.isEmpty()){
+        		log.debug("no class dependent on " + ce.getClassName());
+        	}else{
+        		ncc = ncc.transform(ce,eDependent);
+        	}
         }
         return ncc;
 	}

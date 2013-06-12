@@ -159,6 +159,7 @@ public abstract class ClassFirewall extends Technique {
 	}
 	/**
 	 * current version is pPrime, previous version is p
+	 * TODO: this needs to be modified to use the method below, not used in evaluation though
 	 * @return
 	 */
 	@Override
