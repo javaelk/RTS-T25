@@ -25,6 +25,13 @@ public  class MD5ClassChangeAnalyzer {
 	public static String NEW_CLASSENTITY_KEY = "NEW";
 	public static String MODIFIED_CLASSENTITY_KEY = "MODIFIED";
 	public static String DELETED_CLASSENTITY_KEY = "DELETED";
+	public static void main(String[] args){
+		Path p0 = Paths.get(args[0]);
+		Path p1 = Paths.get(args[1]);
+		System.out.println("googelHashing - " + googelHashing(p0,p1));
+		System.out.println("javaMessageDigest - " + javaMessageDigest(p0,p1));
+		System.out.println("apacheCommons - " + apacheCommons(p0,p1));
+	}
 
 	/**
 	 * Compare a program v0 to another program v1 and return new classes in v1 , modified classes in v0, and deleted classes in v0

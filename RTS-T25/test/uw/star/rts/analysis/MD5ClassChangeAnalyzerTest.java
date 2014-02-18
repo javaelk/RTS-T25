@@ -2,7 +2,6 @@ package uw.star.rts.analysis;
 
 import static org.junit.Assert.*;
 
-
 import java.io.File;
 import java.nio.file.Paths;
 
@@ -10,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uw.star.rts.artifact.*;
-
 import uw.star.rts.extraction.ArtifactFactory;
 import uw.star.rts.extraction.SIRJavaFactory;
 import uw.star.rts.util.Constant;
@@ -32,20 +30,31 @@ public class MD5ClassChangeAnalyzerTest {
 	@Test
 	public void testMD5ClassChangeAnalyzer() {
 		//todo:more tests here
-		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
+/*		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
 		Paths.get(EXPERIMENT_ROOT+"/apache-ant/versions.alt/orig/v1/ant/build/classes/org/apache/tools/ant/FileScanner.class"),
-		Paths.get(EXPERIMENT_ROOT+"/apache-ant/versions.alt/orig/v0/ant/build/classes/org/apache/tools/ant/FileScanner.class")));
+		Paths.get(EXPERIMENT_ROOT+"/apache-ant/versions.alt/orig/v0/ant/build/classes/org/apache/tools/ant/FileScanner.class")));*/
 		
 /*		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
 				Paths.get("/home/wliu/archive/commentsRemoved/jacoco_core/versions.alt/orig/v0/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class"),
-				Paths.get("/home/wliu/archive/commentsRemoved/jacoco_core/versions.alt/orig/v1/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class")));
+				Paths.get("/home/wliu/archive/commentsRemoved/jacoco_core/verlsions.alt/orig/v1/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class")));
 */		
-		assertFalse(MD5ClassChangeAnalyzer.hasSameMD5Digest(
-				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v0/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class"),
-				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v1/jacoco_core/build/classes/org/jacoco/core/analysis/Analyzer.class")));
+
+/*		assertFalse(MD5ClassChangeAnalyzer.hasSameMD5Digest(
+				Paths.get(EXPERIMENT_ROOT+"/apache_solr_core_release-TM/versions.alt/orig/v0/apache_solr_core_release/build/classes/solr/org/apache/solr/schema/LatLonType.class"),
+				Paths.get(EXPERIMENT_ROOT+"/apache_solr_core_release-TM/versions.alt/orig/v1/apache_solr_core_release/build/classes/solr/org/apache/solr/schema/LatLonType.class")));
+*/
+		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
+				Paths.get(EXPERIMENT_ROOT+"/jacoco_core-TC/versions.alt/orig/v4/jacoco_core/build/classes/org/jacoco/core/internal/analysis/ClassAnalyzer.class"),
+				Paths.get(EXPERIMENT_ROOT+"/jacoco_core-TC/versions.alt/orig/v3/jacoco_core/build/classes/org/jacoco/core/internal/analysis/ClassAnalyzer.class")));
 		
 		
+/*		assertFalse(MD5ClassChangeAnalyzer.hasSameMD5Digest(
+				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v3/jacoco_core/build/classes/org/jacoco/core/runtime/AgentOptions$OutputMode.class"),
+				Paths.get(EXPERIMENT_ROOT+"/jacoco_core/versions.alt/orig/v4/jacoco_core/build/classes/org/jacoco/core/runtime/AgentOptions$OutputMode.class")
+				));*/
 	}
+	
+
 	
 	@Test
 	public void diffTest(){
