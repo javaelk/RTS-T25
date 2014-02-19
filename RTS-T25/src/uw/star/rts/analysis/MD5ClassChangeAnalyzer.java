@@ -1,6 +1,8 @@
 package uw.star.rts.analysis;
 import java.nio.file.*;
+
 import uw.star.rts.artifact.*;
+import uw.star.rts.util.ClassEntityComparator;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,12 +37,17 @@ public  class MD5ClassChangeAnalyzer {
 
 	/**
 	 * Compare a program v0 to another program v1 and return new classes in v1 , modified classes in v0, and deleted classes in v0
+	 * {DELETED} = {v0} - {v1}
+	 * {NEW} = {V1}-{V0}
+	 * {MODIFIED} = {V0} INTERSECT {V1} and e0 and e1 does not have the same MD5digest
 	 *  
 	 * @param v0
 	 * @param v1
 	 * @return a map with key "NEW" "MODIFIED" "DELETED"
 	 */
 	public static Map<String,List<ClassEntity>> diff(Program v0,Program v1){
+	  ClassEntityComparator comparator = new ClassEntityComparator();
+		
 		List<ClassEntity> newClassEntities = new ArrayList<ClassEntity>();
 		List<ClassEntity> modifiedClassEntities = new ArrayList<ClassEntity>();
 		List<ClassEntity> deletedClassEntities = new ArrayList<ClassEntity>();
@@ -50,7 +57,7 @@ public  class MD5ClassChangeAnalyzer {
 		for(Entity e0: v0.getCodeEntities(EntityType.CLAZZ)){
 			boolean c0IsFoundinV1 = false;
 			for(int i=0;i<v1ClassEntities.size();i++){
-				if(((ClassEntity)e0).getPackageName().equals(((ClassEntity)v1ClassEntities.get(i)).getPackageName())&&((ClassEntity)e0).getClassName().equals(((ClassEntity)v1ClassEntities.get(i)).getClassName())){
+				if(comparator.compare((ClassEntity)e0,(ClassEntity)(v1ClassEntities.get(i)))==0){
 					//if c0 is found in v1, then c1 is not new
 					c0IsFoundinV1 = true;
 					v1OldEntites.set(i); // set to true , which means this entity is old

@@ -44,8 +44,8 @@ public class MD5ClassChangeAnalyzerTest {
 				Paths.get(EXPERIMENT_ROOT+"/apache_solr_core_release-TM/versions.alt/orig/v1/apache_solr_core_release/build/classes/solr/org/apache/solr/schema/LatLonType.class")));
 */
 		assertTrue(MD5ClassChangeAnalyzer.hasSameMD5Digest(
-				Paths.get(EXPERIMENT_ROOT+"/jacoco_core-TC/versions.alt/orig/v4/jacoco_core/build/classes/org/jacoco/core/internal/analysis/ClassAnalyzer.class"),
-				Paths.get(EXPERIMENT_ROOT+"/jacoco_core-TC/versions.alt/orig/v3/jacoco_core/build/classes/org/jacoco/core/internal/analysis/ClassAnalyzer.class")));
+				Paths.get(EXPERIMENT_ROOT+"/jacoco-core-releases-TC/versions.alt/orig/v3/jacoco_core/build/classes/org/jacoco/core/analysis/ICoverageNode$CounterEntity.class"),
+				Paths.get(EXPERIMENT_ROOT+"/jacoco-core-releases-TC/versions.alt/orig/v4/jacoco_core/build/classes/org/jacoco/core/analysis/ICoverageNode$CounterEntity.class")));
 		
 		
 /*		assertFalse(MD5ClassChangeAnalyzer.hasSameMD5Digest(
